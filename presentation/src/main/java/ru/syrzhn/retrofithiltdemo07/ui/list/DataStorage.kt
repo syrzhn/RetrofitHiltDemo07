@@ -19,6 +19,11 @@ object DataStorage {
      */
     val ITEM_MAP: MutableMap<Int, Course> = HashMap()
 
+    fun fill(items: List<Course>) {
+        ITEMS.clear()
+        ITEMS.addAll(items)
+    }
+
     fun addItem(item: Course) {
         ITEMS.add(item)
         ITEM_MAP[item.id] = item

@@ -1,14 +1,21 @@
 package ru.syrzhn.retrofithiltdemo07.ui.login
 
+import android.util.Log
 import android.util.Patterns
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.syrzhn.data.network.ApiService
+import ru.syrzhn.data.network.Course
 import ru.syrzhn.data.network.UsersList
+import ru.syrzhn.data.network.createRetrofit
 import ru.syrzhn.retrofithiltdemo07.R
+import ru.syrzhn.retrofithiltdemo07.ui.list.DataStorage
 import kotlin.time.Duration.Companion.milliseconds
 
 class LoginViewModel(private val usersList: UsersList) : ViewModel() {

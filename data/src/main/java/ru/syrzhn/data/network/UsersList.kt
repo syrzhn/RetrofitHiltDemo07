@@ -1,12 +1,14 @@
 package ru.syrzhn.data.network
 
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import ru.syrzhn.domain.User
 
 /**
  * The stub class represents a list of all
  * valid users to log into this application
  */
+@Singleton
 class UsersList @Inject constructor() {
     private val approvedUsers = arrayOf(
         User("qwerty@gmail.com", "123456"),

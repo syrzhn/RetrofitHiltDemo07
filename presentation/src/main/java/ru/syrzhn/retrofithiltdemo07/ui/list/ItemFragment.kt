@@ -8,7 +8,6 @@ import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,12 +15,24 @@ import dagger.hilt.android.lifecycle.withCreationCallback
 import ru.syrzhn.data.network.Course
 import ru.syrzhn.retrofithiltdemo07.R
 import ru.syrzhn.retrofithiltdemo07.databinding.FragmentItemListBinding
+import ru.syrzhn.retrofithiltdemo07.ui.list.adapterdelegate.CompositeAdapter
+import ru.syrzhn.retrofithiltdemo07.ui.list.adapterdelegate.CourseAdapter
 
 /**
  * A fragment representing a list of Items.
  */
 @AndroidEntryPoint
 class ItemFragment : Fragment() {
+
+    private val compositeAdapter by lazy {
+        CompositeAdapter.Builder()
+            .add(CourseAdapter(
+                context = requireContext(),
+                values = DataStorage.ITEMS,
+                onCourseClickListener = onCourseClickListener
+            ))
+            .build()
+    }
 
     private val itemsListViewModel by viewModels<ItemsListViewModel>(
         extrasProducer = {
@@ -34,6 +45,7 @@ class ItemFragment : Fragment() {
     private var columnCount = 1
     private lateinit var recyclerView: RecyclerView
     private lateinit var clickListener: CoursesRecyclerViewAdapter.OnClickListener
+    private lateinit var onCourseClickListener: CourseAdapter.OnCourseClickListener
 
     private var _binding: FragmentItemListBinding? = null
 
@@ -71,7 +83,7 @@ class ItemFragment : Fragment() {
                 // navigate to details fragment
             }
 
-            override fun onLikeClick( position: Int ) {
+            override fun onLikeClick(position: Int ) {
                 itemsListViewModel.setLike(position)
             }
         }
@@ -90,6 +102,16 @@ class ItemFragment : Fragment() {
         val favoriteButton = view.findViewById<RelativeLayout>(R.id.favorite)
         favoriteButton.setOnClickListener {
             itemsListViewModel.goFavorite()
+        }
+
+        onCourseClickListener = object : CourseAdapter.OnCourseClickListener {
+            override fun onClick(position: Int, item: Course) {
+                // navigate to details fragment
+            }
+
+            override fun onLikeClick(isLiked: Boolean ) {
+                //itemsListViewModel.setLike(position)
+            }
         }
 
         return view
@@ -121,7 +143,7 @@ class ItemFragment : Fragment() {
         itemsListViewModel.loading.observe(
             viewLifecycleOwner,
             Observer { load ->
-                binding.loadingCourses.visibility = if (load )
+                binding.loadingCourses.visibility = if (load)
                     View.VISIBLE
                 else
                     View.GONE

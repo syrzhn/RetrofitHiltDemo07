@@ -35,5 +35,6 @@
     <string name="house_text">Главная</string>
     <string name="favorite_text">Избранное</string>
     <string name="account_text">Аккаунт</string>
+    <string name="sum_rub">$s ₽</string>
 
 </resources>

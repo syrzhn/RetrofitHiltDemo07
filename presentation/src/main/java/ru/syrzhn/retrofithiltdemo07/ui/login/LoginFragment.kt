@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 import kotlinx.coroutines.launch
 import ru.syrzhn.data.network.ApiService
+import ru.syrzhn.data.network.Course
 import ru.syrzhn.data.network.UsersList
 import ru.syrzhn.data.network.createRetrofit
 import ru.syrzhn.retrofithiltdemo07.R
@@ -47,19 +48,6 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        val apiService: ApiService = createRetrofit(requireContext()).create(ApiService::class.java)
-        lifecycleScope.launch {
-            try {
-                val response = apiService.getCourses()
-                response.courses.forEach {
-                    DataStorage.addItem(it)
-                    Log.d("CourseData", "Id: ${it.id}, Age: ${it.title}")
-                }
-            } catch (e: Exception) {
-                Log.e("Error", e.message.toString())
-            }
-        }
 
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
@@ -172,6 +160,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun updateUiWithUser(message: String) {
+        loadFromRetrofit()
         val welcome = getString(R.string.welcome) + " $message"
         val appContext = context?.applicationContext ?: return
         Toast.makeText(appContext, welcome, Toast.LENGTH_LONG).show()
@@ -179,6 +168,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
+        loadFromRetrofit()
         val appContext = context?.applicationContext ?: return
         Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
         findNavController().navigate(R.id.action_LoginFragment_to_SecondFragment)
@@ -187,5 +177,22 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun loadFromRetrofit() {
+        lifecycleScope.launch {
+            try {
+                val apiService: ApiService = createRetrofit(requireContext()).create(ApiService::class.java)
+                val listCourses = mutableListOf<Course>()
+                val response = apiService.getCourses()
+                response.courses.forEach {
+                    listCourses.add(it)
+                    Log.d("CourseData", "Id: ${it.id}, Title: ${it.title}")
+                }
+                DataStorage.fill(listCourses)
+            } catch (e: Exception) {
+                Log.e("Error", e.message.toString())
+            }
+        }
     }
 }
